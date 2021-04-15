@@ -56,14 +56,17 @@
         android:label="fragment_cart"
         tools:layout="@layout/fragment_cart">
 
-        <argument
-            android:name="recipient"
-            android:defaultValue="None" />
         <action
             android:id="@+id/action_CartFragment_to_CheckoutFragment"
             app:destination="@id/CheckoutFragment"
             app:enterAnim="@anim/slide_from_right"
             app:exitAnim="@anim/slide_to_left" />
+        <argument
+            android:name="username"
+            app:argType="string" />
+        <argument
+            android:name="password"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/BookStoreFragment"
@@ -79,12 +82,20 @@
             android:id="@+id/action_BookStoreFragment_to_LoginFragment"
             app:destination="@id/LoginFragment"
             app:enterAnim="@anim/slide_from_left"
-            app:exitAnim="@anim/slide_to_right" />
+            app:exitAnim="@anim/slide_to_right"
+            app:popUpTo="@id/LoginFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_BookStoreFragment_to_profileFragment"
             app:destination="@id/profileFragment"
             app:enterAnim="@anim/slide_from_right"
             app:exitAnim="@anim/slide_to_left" />
+        <argument
+            android:name="username"
+            app:argType="string" />
+        <argument
+            android:name="password"
+            app:argType="string" />
     </fragment>
 
     <fragment
@@ -117,6 +128,12 @@
             app:destination="@id/BookStoreFragment"
             app:enterAnim="@anim/slide_from_left"
             app:exitAnim="@anim/slide_to_right" />
+        <argument
+            android:name="username"
+            app:argType="string" />
+        <argument
+            android:name="password"
+            app:argType="string" />
     </fragment>
 
 </navigation>
