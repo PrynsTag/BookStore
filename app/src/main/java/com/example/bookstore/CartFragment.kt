@@ -10,27 +10,20 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_cart.*
 
 class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnClickListener {
-    private lateinit var username: String
-    private lateinit var password: String
-    private lateinit var bookList: MutableList<BookInfo>
+    private lateinit var userBook: MutableList<BookInfo>
 
     private lateinit var adapter: RecyclerView.Adapter<RecyclerAdapter.ViewHolder>
     private lateinit var navController: NavController
-    private lateinit var bundle: Bundle
     private lateinit var db: DatabaseHelper
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        username = arguments!!.getString("username").toString()
-        password = arguments!!.getString("password").toString()
-        bundle = bundleOf("username" to username, "password" to password)
-    }
+    private val args: CartFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,6 +34,7 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val bundle = bundleOf("username" to args.username, "password" to args.password)
         navController = Navigation.findNavController(view)
 
         bottom_nav.setupWithNavController(navController)
@@ -50,22 +44,22 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
         }
 
         db = DatabaseHelper(activity!!)
-        bookList = db.getBookData(username, password)
+        userBook = db.getBookData(args.username, args.password)
 
-        txv_totalAmount.text = bookList.sumBy { it.price }.toString() // Calculate Total Price
+        txv_totalAmount.text = userBook.sumBy { it.price }.toString() // Calculate Total Price
 
-        adapter = initRecycler(activity!!, bookList, this, recycler_cart_view, R.layout.card_delete)
+        adapter = initRecycler(activity!!, userBook, this, recycler_cart_view, R.layout.card_delete)
 
         view.findViewById<Button>(R.id.btn_pay).setOnClickListener(this)
     }
 
     override fun onItemClick(position: Int) {
-        val currentItem = bookList[position]
+        val currentItem = userBook[position]
         val (id, title, author, _, _, _) = currentItem
 
-        val numDeleted = db.deleteBookData(id, title, author, username, password)
+        val numDeleted = db.deleteBookData(id, title, author, args.username, args.password)
         if (numDeleted > 0) {
-            bookList.removeAt(position).apply {
+            userBook.removeAt(position).apply {
                 // Update Total Price
                 txv_totalAmount.text =
                     (Integer.parseInt(txv_totalAmount.text.toString()) - this.price).toString()
@@ -90,8 +84,8 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.btn_pay -> {
-                val removedCount = db.checkOut(username, password)
-                bookList.clear()
+                val removedCount = db.checkOut(args.username, args.password)
+                userBook.clear()
                 adapter.notifyItemRangeRemoved(0, removedCount)
                 txv_totalAmount.text = "0"
                 Snackbar.make(
@@ -100,10 +94,9 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
                     Snackbar.LENGTH_SHORT
                 ).apply {
                     this.setAction("View Checkout") {
-                        navController.navigate(
-                            R.id.action_CartFragment_to_CheckoutFragment,
-                            bundle
-                        )
+                        CartFragmentDirections.actionCartFragmentToCheckoutFragment().apply {
+                            navController.navigate(this)
+                        }
                         this.dismiss()
                     }.show()
                 }
