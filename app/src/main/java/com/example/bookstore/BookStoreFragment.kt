@@ -1,18 +1,16 @@
 package com.example.bookstore
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_book_store.*
 import org.json.JSONArray
@@ -20,55 +18,54 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class BookStoreFragment : Fragment(), RecyclerAdapter.OnItemClickListener {
-    private lateinit var username: String
-    private lateinit var password: String
-    private var bookList = mutableListOf<BookInfo>()
+    private val bookList = mutableListOf<BookInfo>()
 
     private lateinit var navController: NavController
     private lateinit var bundle: Bundle
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        username = arguments!!.getString("username").toString()
-        password = arguments!!.getString("password").toString()
-        bundle = bundleOf("username" to username, "password" to password)
-    }
+    private val args: BookStoreFragmentArgs by navArgs()
 
-    @Override
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.nav_cart, menu)
         return super.onCreateOptionsMenu(menu, inflater)
     }
 
-    @Override
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.cart -> navController.navigate(
-                R.id.action_BookStoreFragment_to_CartFragment,
-                bundle
-            )
-            R.id.acb_btnLogout -> {
-                fragmentManager?.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                navController.navigate(R.id.action_BookStoreFragment_to_LoginFragment)
+            R.id.cart -> {
+                BookStoreFragmentDirections.actionBookStoreFragmentToCartFragment(
+                    args.username,
+                    args.password
+                ).apply {
+                    navController.navigate(this)
+                }
             }
-            R.id.acb_profile -> navController.navigate(
-                R.id.action_BookStoreFragment_to_profileFragment,
-                bundle
-            )
+            R.id.acb_btnLogout -> {
+                BookStoreFragmentDirections.actionBookStoreFragmentToLoginFragment().apply {
+                    navController.navigate(this)
+                }
+            }
+            R.id.acb_profile -> {
+                BookStoreFragmentDirections.actionBookStoreFragmentToProfileFragment(
+                    args.username,
+                    args.password
+                ).apply {
+                    navController.navigate(this)
+                }
+            }
         }
         return super.onOptionsItemSelected(item)
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
+        bundle = bundleOf("username" to args.username, "password" to args.password)
         return inflater.inflate(R.layout.fragment_book_store, container, false)
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         navController = findNavController(view)
 
@@ -86,7 +83,11 @@ class BookStoreFragment : Fragment(), RecyclerAdapter.OnItemClickListener {
         val (id, title, author, page, image, price) = currentItem
         val db = DatabaseHelper(context!!)
         val insertedBook =
-            db.insertBookData(BookInfo(id, title, author, page, image, price), username, password)
+            db.insertBookData(
+                BookInfo(id, title, author, page, image, price),
+                args.username,
+                args.password
+            )
 
         if (insertedBook) {
             Snackbar.make(
@@ -95,7 +96,13 @@ class BookStoreFragment : Fragment(), RecyclerAdapter.OnItemClickListener {
                 Snackbar.LENGTH_LONG
             ).apply {
                 this.setAction("View Cart") {
-                    navController.navigate(R.id.action_BookStoreFragment_to_CartFragment, bundle)
+                    BookStoreFragmentDirections.actionBookStoreFragmentToCartFragment(
+                        args.username,
+                        args.password
+                    ).apply {
+                        navController.navigate(this)
+                    }
+
                     this.dismiss()
                 }.show()
             }
