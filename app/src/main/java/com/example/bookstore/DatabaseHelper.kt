@@ -77,7 +77,7 @@ class DatabaseHelper(context: Context) :
         email: String,
         username: String,
         password: String
-    ): UserData {
+    ): Boolean {
         val db: SQLiteDatabase = writableDatabase
 
         val values = ContentValues()
@@ -92,11 +92,7 @@ class DatabaseHelper(context: Context) :
             null
         )
 
-        return if (updatedUser > 0) {
-            UserData(name, inputUsername, email)
-        } else {
-            UserData("", "", "")
-        }
+        return updatedUser > 0
     }
 
     @SuppressLint("Recycle")

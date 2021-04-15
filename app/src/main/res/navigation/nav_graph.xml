@@ -134,6 +134,11 @@
         <argument
             android:name="password"
             app:argType="string" />
+        <action
+            android:id="@+id/action_profileFragment_to_LoginFragment"
+            app:destination="@id/LoginFragment"
+            app:popUpTo="@id/LoginFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>

@@ -8,33 +8,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 class ProfileFragment : Fragment(), View.OnClickListener {
     private lateinit var db: DatabaseHelper
     private lateinit var userData: UserData
-    private lateinit var updatedData: UserData
     private lateinit var navController: NavController
 
     private val args: ProfileFragmentArgs by navArgs()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        db = DatabaseHelper(activity!!)
-        userData = db.getUserData(args.username, args.password)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        db = DatabaseHelper(activity!!)
+        userData = db.getUserData(args.username, args.password)
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 
@@ -59,26 +54,28 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.btn_update -> {
-                updatedData = db.updateUserData(
+                val updatedData = db.updateUserData(
                     inp_name.text.toString(),
                     inp_username.text.toString(),
                     inp_email.text.toString(),
                     args.username,
                     args.password
                 )
-                if (updatedData.name != "") {
-                    userData = db.getUserData(updatedData.username, args.password)
-                    Snackbar.make(
-                        activity!!.findViewById(android.R.id.content),
+                if (updatedData) {
+                    Toast.makeText(
+                        activity,
                         "user ${userData.username} has been updated.",
-                        Snackbar.LENGTH_SHORT
-                    ).apply { this.setAction("Undo") { this.dismiss() }.show() }
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    ProfileFragmentDirections.actionProfileFragmentToLoginFragment().apply {
+                        navController.navigate(this)
+                    }
                 } else {
-                    Snackbar.make(
-                        activity!!.findViewById(android.R.id.content),
-                        "user ${userData.username} has not been updated.",
-                        Snackbar.LENGTH_SHORT
-                    )
+                    Toast.makeText(
+                        activity,
+                        "user ${userData.username} has NOT been updated.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 //  Hide keyword when button clicked
                 val inputManager =

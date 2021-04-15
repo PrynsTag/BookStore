@@ -19,17 +19,15 @@
 
     <LinearLayout
         android:id="@+id/lry_prfname"
-        android:layout_width="409dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:baselineAligned="false"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:weightSum="100"
-        app:layout_constraintBottom_toTopOf="@+id/lry_prfusername"
-        app:layout_constraintEnd_toEndOf="@+id/lry_prfusername"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/lry_prfusername"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/img_prfuser">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -53,16 +51,15 @@
 
     <LinearLayout
         android:id="@+id/lry_prfusername"
-        android:layout_width="409dp"
-        android:layout_height="100dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:baselineAligned="false"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:weightSum="100"
-        app:layout_constraintBottom_toTopOf="@+id/lry_prfemail"
-        app:layout_constraintEnd_toEndOf="@+id/lry_prfemail"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/lry_prfemail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lry_prfname">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -86,15 +83,14 @@
 
     <LinearLayout
         android:id="@+id/lry_prfemail"
-        android:layout_width="409dp"
-        android:layout_height="100dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:baselineAligned="false"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:weightSum="100"
-        app:layout_constraintBottom_toTopOf="@+id/btn_update"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lry_prfusername">
 
@@ -121,22 +117,12 @@
         android:id="@+id/btn_update"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:text="@string/btn_prfupdate"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btn_back"
-        app:layout_constraintTop_toBottomOf="@+id/lry_prfemail" />
-
-    <Button
-        android:id="@+id/btn_back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_prfback"
-        app:layout_constraintEnd_toStartOf="@+id/btn_update"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btn_update" />
+        app:layout_constraintTop_toBottomOf="@+id/lry_prfemail"
+        app:layout_constraintVertical_bias="0.142" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
@@ -147,5 +133,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/menu" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="20dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="411dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
