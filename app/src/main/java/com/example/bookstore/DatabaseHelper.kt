@@ -60,16 +60,6 @@ class DatabaseHelper(context: Context) :
         val db: SQLiteDatabase = readableDatabase
         val cursor = db.rawQuery(query, null)
 
-        if (cursor.moveToFirst()) {
-            UserData(
-                cursor.getString(cursor.getColumnIndex("user_name")),
-                cursor.getString(cursor.getColumnIndex("user_username")),
-                cursor.getString(cursor.getColumnIndex("user_email"))
-            )
-        } else {
-            UserData("That didn't work!", "That didn't work!", "That didn't work!")
-        }
-
         return if (cursor.moveToFirst()) {
             UserData(
                 cursor.getString(cursor.getColumnIndex("user_name")),
@@ -79,7 +69,6 @@ class DatabaseHelper(context: Context) :
         } else {
             UserData("That didn't work!", "That didn't work!", "That didn't work!")
         }
-//        return
     }
 
     fun updateUserData(
