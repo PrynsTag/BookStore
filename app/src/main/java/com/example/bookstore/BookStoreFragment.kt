@@ -15,7 +15,6 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_book_store.*
 import org.json.JSONArray
 import org.json.JSONException
-import org.json.JSONObject
 
 class BookStoreFragment : Fragment(), RecyclerAdapter.OnItemClickListener {
     private val bookList = mutableListOf<BookInfo>()
@@ -119,26 +118,26 @@ class BookStoreFragment : Fragment(), RecyclerAdapter.OnItemClickListener {
     private fun getBookData() {
         val queue = Volley.newRequestQueue(activity)
         val url =
-            "https://raw.githubusercontent.com/CWGGa/Book_API/main/book_api.json?token=ANOGHMZIP4S5GQF2DAS2UFLAPRWKE"
+            "https://raw.githubusercontent.com/bvaughn/infinite-list-reflow-examples/master/books.json"
 
         val stringRequest = StringRequest(
             Request.Method.GET, url, { response ->
                 try {
-                    val jsonObject = JSONObject(response.toString())
-                    val arrItems: JSONArray = jsonObject.getJSONArray("book")
+                    val arrItems = JSONArray(response.toString())
 
                     for (i in 0 until arrItems.length()) {
-                        val item: JSONObject = arrItems.getJSONObject(i)
-                        bookList.add(
-                            BookInfo(
-                                0,
-                                item.getString("title"),
-                                item.getJSONArray("authors")[0] as String,
-                                item.getString("pageCount"),
-                                item.getString("thumbnailUrl"),
-                                (100..999).random()
+                        arrItems.getJSONObject(i).apply {
+                            bookList.add(
+                                BookInfo(
+                                    0,
+                                    this.getString("title"),
+                                    this.getJSONArray("authors")[0] as String,
+                                    this.getString("pageCount"),
+                                    this.getString("thumbnailUrl"),
+                                    (100..999).random()
+                                )
                             )
-                        )
+                        }
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
