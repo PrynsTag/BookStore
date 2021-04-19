@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -70,7 +71,23 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
                 activity!!.findViewById(android.R.id.content),
                 "$title has been deleted to cart.",
                 Snackbar.LENGTH_SHORT
-            ).apply { this.setAction("Undo") { this.dismiss() }.show() }
+            ).apply {
+                this.setAction("Undo") {
+                    userBook.add(position, currentItem)
+                    db.insertBookData(currentItem, args.username, args.password)
+                    adapter.notifyItemInserted(position)
+
+                    // Update Total Price
+                    txv_totalAmount.text =
+                        (Integer.parseInt(txv_totalAmount.text.toString()) + currentItem.price).toString()
+
+                    Toast.makeText(
+                        activity,
+                        "${currentItem.title} not removed.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }.show()
+            }
 
         } else {
             Snackbar.make(
@@ -84,10 +101,13 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.btn_pay -> {
-                val removedCount = db.checkOut(args.username, args.password)
                 userBook.clear()
-                adapter.notifyItemRangeRemoved(0, removedCount)
+                db.checkOut(args.username, args.password).apply {
+                    adapter.notifyItemRangeRemoved(0, this)
+                }
+
                 txv_totalAmount.text = "0"
+
                 Snackbar.make(
                     activity!!.findViewById(android.R.id.content),
                     "Checkout success",
