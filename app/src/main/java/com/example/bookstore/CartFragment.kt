@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_cart.*
@@ -51,51 +52,26 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
 
         adapter = initRecycler(activity!!, userBook, this, recycler_cart_view, R.layout.card_delete)
 
+        ItemTouchHelper(object :
+            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                deleteItem(viewHolder.adapterPosition)
+            }
+        }).attachToRecyclerView(recycler_cart_view)
+
         view.findViewById<Button>(R.id.btn_pay).setOnClickListener(this)
     }
 
     override fun onItemClick(position: Int) {
-        val currentItem = userBook[position]
-        val (id, title, author, _, _, _) = currentItem
-
-        val numDeleted = db.deleteBookData(id, title, author, args.username, args.password)
-        if (numDeleted > 0) {
-            userBook.removeAt(position).apply {
-                // Update Total Price
-                txv_totalAmount.text =
-                    (Integer.parseInt(txv_totalAmount.text.toString()) - this.price).toString()
-            }
-            adapter.notifyItemRemoved(position)
-
-            Snackbar.make(
-                activity!!.findViewById(android.R.id.content),
-                "$title has been deleted to cart.",
-                Snackbar.LENGTH_SHORT
-            ).apply {
-                this.setAction("Undo") {
-                    userBook.add(position, currentItem)
-                    db.insertBookData(currentItem, args.username, args.password)
-                    adapter.notifyItemInserted(position)
-
-                    // Update Total Price
-                    txv_totalAmount.text =
-                        (Integer.parseInt(txv_totalAmount.text.toString()) + currentItem.price).toString()
-
-                    Toast.makeText(
-                        activity,
-                        "${currentItem.title} not removed.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }.show()
-            }
-
-        } else {
-            Snackbar.make(
-                activity!!.findViewById(android.R.id.content),
-                "$title not deleted",
-                Snackbar.LENGTH_LONG
-            ).show()
-        }
+        deleteItem(position)
     }
 
     override fun onClick(v: View?) {
@@ -122,5 +98,53 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
                 }
             }
         }
+    }
+
+    private fun deleteItem(position: Int) {
+        val currentItem = userBook[position]
+        val (id, title, author, _, _, _) = currentItem
+
+        val numDeleted = db.deleteBookData(id, title, author, args.username, args.password)
+        if (numDeleted > 0) {
+            userBook.removeAt(position).apply {
+                // Update Total Price
+                txv_totalAmount.text =
+                    (Integer.parseInt(txv_totalAmount.text.toString()) - this.price).toString()
+            }
+            adapter.notifyItemRemoved(position)
+
+            Snackbar.make(
+                activity!!.findViewById(android.R.id.content),
+                "$title has been deleted to cart.",
+                Snackbar.LENGTH_SHORT
+            ).apply {
+                this.setAction("Undo") {
+                    insertItem(position, currentItem)
+                }.show()
+            }
+
+        } else {
+            Snackbar.make(
+                activity!!.findViewById(android.R.id.content),
+                "$title not deleted",
+                Snackbar.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun insertItem(position: Int, item: BookInfo) {
+        userBook.add(position, item)
+        db.insertBookData(item, args.username, args.password)
+        adapter.notifyItemInserted(position)
+
+        // Update Total Price
+        txv_totalAmount.text =
+            (Integer.parseInt(txv_totalAmount.text.toString()) + item.price).toString()
+
+        Toast.makeText(
+            activity,
+            "${item.title} restored.",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }
