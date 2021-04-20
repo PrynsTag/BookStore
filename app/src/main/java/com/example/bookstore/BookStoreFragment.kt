@@ -132,8 +132,8 @@ class BookStoreFragment : Fragment(), RecyclerAdapter.OnItemClickListener {
                                     0,
                                     this.getString("title"),
                                     this.getJSONArray("authors")[0] as String,
-                                    this.getString("pageCount"),
                                     this.getString("thumbnailUrl"),
+                                    this.getString("pageCount"),
                                     (100..999).random()
                                 )
                             )
