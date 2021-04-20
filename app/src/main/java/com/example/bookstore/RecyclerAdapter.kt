@@ -23,7 +23,7 @@ class RecyclerAdapter(
     override fun onBindViewHolder(holder: RecyclerAdapter.ViewHolder, position: Int) {
         val currentItem = bookInfo[position]
         holder.itemTitle.text = currentItem.title
-        holder.itemAuthor.text = currentItem.author
+        holder.itemAuthor.text = currentItem.author.joinToString(", ")
         holder.itemPage.text = currentItem.numPages
         Picasso.get().load(currentItem.imageUrl).resize(50, 50).centerCrop().into(holder.itemImage)
         holder.itemPrice.text = currentItem.price.toString()

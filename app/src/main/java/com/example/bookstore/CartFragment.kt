@@ -102,9 +102,9 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
 
     private fun deleteItem(position: Int) {
         val currentItem = userBook[position]
-        val (id, title, author, _, _, _) = currentItem
+        val (id, title, _, _, _, _) = currentItem
 
-        val numDeleted = db.deleteBookData(id, title, author, args.username, args.password)
+        val numDeleted = db.deleteBookData(id, title, args.username, args.password)
         if (numDeleted > 0) {
             userBook.removeAt(position).apply {
                 // Update Total Price

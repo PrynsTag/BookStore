@@ -1,14 +1,13 @@
 package com.example.bookstore
 
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 data class BookInfo(
     val id: Int = 0,
     var title: String,
-    var author: String,
+    var author: List<String>,
     var imageUrl: String,
     var numPages: String,
     var price: Int,

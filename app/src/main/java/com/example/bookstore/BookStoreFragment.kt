@@ -131,7 +131,7 @@ class BookStoreFragment : Fragment(), RecyclerAdapter.OnItemClickListener {
                                 BookInfo(
                                     0,
                                     this.getString("title"),
-                                    this.getJSONArray("authors")[0] as String,
+                                    this.getJSONArray("authors").join(",").split(","),
                                     this.getString("thumbnailUrl"),
                                     this.getString("pageCount"),
                                     (100..999).random()
@@ -144,21 +144,16 @@ class BookStoreFragment : Fragment(), RecyclerAdapter.OnItemClickListener {
                 }
                 initRecycler(activity!!, bookList, this, book_store_rv, R.layout.card_item)
             }, {
-                repeat(5) {
-                    bookList.add(
-                        BookInfo(
-                            0,
-                            "That didn't work!",
-                            "That didn't work!",
-                            "That didn't work!",
-                            "https://homepages.cae.wisc.edu/~ece533/images/cat.png",
-                            0
-                        )
-                    )
-                }
+                error("That didn't work!")
             })
 
         queue.add(stringRequest)
+    }
+
+    private fun error(error: String) {
+        repeat(5) {
+            bookList.add(BookInfo(0, error, arrayListOf(error), error, error, 0))
+        }
     }
 }
 

@@ -115,7 +115,7 @@ class DatabaseHelper(context: Context) :
         val values = ContentValues()
         val (_, title, author, image, pages, price) = bookInfo
         values.put("book_name", title)
-        values.put("book_author", author)
+        values.put("book_author", author.joinToString(","))
         values.put("book_image", image)
         values.put("book_pages", pages)
         values.put("book_price", price)
@@ -151,7 +151,7 @@ class DatabaseHelper(context: Context) :
                 BookInfo(
                     bookCursor.getInt(bookCursor.getColumnIndex("book_id")),
                     bookCursor.getString(bookCursor.getColumnIndex("book_name")),
-                    bookCursor.getString(bookCursor.getColumnIndex("book_author")),
+                    bookCursor.getString(bookCursor.getColumnIndex("book_author")).split(", "),
                     bookCursor.getString(bookCursor.getColumnIndex("book_image")),
                     bookCursor.getString(bookCursor.getColumnIndex("book_pages")),
                     bookCursor.getInt(bookCursor.getColumnIndex("book_price"))
@@ -191,7 +191,6 @@ class DatabaseHelper(context: Context) :
     fun deleteBookData(
         id: Int,
         title: String,
-        author: String,
         username: String,
         password: String
     ): Int {
@@ -209,7 +208,7 @@ class DatabaseHelper(context: Context) :
 
         return db.delete(
             "book",
-            "book_id = '$id' AND book_name = '$title' AND book_author = '$author' AND user_id = '$userId' ",
+            "book_id = '$id' AND book_name = '$title' AND user_id = '$userId' ",
             null
         )
     }
@@ -217,7 +216,8 @@ class DatabaseHelper(context: Context) :
     @SuppressLint("Recycle")
     fun checkOut(username: String, password: String): Int {
         val db: SQLiteDatabase = writableDatabase
-        val query = "SELECT user_id FROM user where user_username = '$username' AND user_password = '$password'"
+        val query =
+            "SELECT user_id FROM user where user_username = '$username' AND user_password = '$password'"
 
         val cursor = db.rawQuery(query, null)
         val userId =
