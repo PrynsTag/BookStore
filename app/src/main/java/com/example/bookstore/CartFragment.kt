@@ -1,6 +1,7 @@
 package com.example.bookstore
 
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_cart.*
+import java.util.*
 
 class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnClickListener {
     private lateinit var userBook: MutableList<BookInfo>
@@ -34,6 +36,7 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
         return inflater.inflate(R.layout.fragment_cart, container, false)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bundle = bundleOf("username" to args.username, "password" to args.password)
@@ -53,12 +56,19 @@ class CartFragment : Fragment(), RecyclerAdapter.OnItemClickListener, View.OnCli
         adapter = initRecycler(activity!!, userBook, this, recycler_cart_view, R.layout.card_delete)
 
         ItemTouchHelper(object :
-            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            ) {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
+                val sourcePosition = viewHolder.adapterPosition
+                val targetPosition = target.adapterPosition
+                Collections.swap(userBook, sourcePosition, targetPosition)
+                adapter.notifyItemMoved(sourcePosition, targetPosition)
                 return true
             }
 
